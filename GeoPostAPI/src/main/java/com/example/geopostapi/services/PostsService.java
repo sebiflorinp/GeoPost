@@ -91,6 +91,16 @@ public class PostsService {
             }
         }
         
+        // if country is not null return all posts according to their country
+        if (country != null) {
+            posts.removeIf(post -> !post.getCountry().equals(country));
+        }
+        
+        // if county is not null return all posts according to their county
+        if (county != null) {
+            posts.removeIf(post -> !post.getCounty().equals(county));
+        }
+        
         return posts;
     }
 }

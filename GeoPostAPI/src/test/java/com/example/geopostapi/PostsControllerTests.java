@@ -177,4 +177,49 @@ public class PostsControllerTests {
                         .param("filter", "invalidFilter"))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    public void getAllPostsFromExistingCountry_ShouldReturnPosts() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("country", "Romania"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(2));
+    }
+
+    @Test
+    public void getAllPostsFromNonExistentCountry_ShouldReturnEmptyList() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("country", "NonExistentCountry"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void getAllPostsFromExistingCounty_ShouldReturnPosts() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("county", "Greater London"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1));
+    }
+
+    @Test
+    public void getAllPostsFromNonExistentCounty_ShouldReturnEmptyList() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("county", "NonExistentCounty"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void getAllPosts_WithAllFiltersCombined_ShouldReturnFilteredPosts() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "last7days")
+                        .param("country", "Romania")
+                        .param("county", "Bucharest"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(2));
+    }
 }
