@@ -44,12 +44,16 @@ public class PostsController {
     }
     
     @GetMapping("/posts")
-    public List<Post> getAllPosts(
+    public ResponseEntity<List<Post>> getAllPosts(
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "county", required = false) String county
     ) {
-        return postsService.getAllPosts(filter, country, county);
+        try {
+            return ResponseEntity.of(Optional.of(postsService.getAllPosts(filter, country, county)));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
     
 }

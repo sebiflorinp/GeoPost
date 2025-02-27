@@ -64,11 +64,33 @@ public class PostsService {
     }
 
     public List<Post> getAllPosts(String filter, String country, String county) {
+        List<Post> posts = postsRepository.findAll();
+        
         // if all the arguments are null return all posts
         if (filter == null && country == null && county == null) {
-            return postsRepository.findAll();
+            return posts;
         }
         
-        return List.of();
+        // if filter is not null return all posts according to their date
+        if (filter != null) {
+            switch (filter) {
+                case "today":
+                    posts.removeIf(post -> !post.getCreatedAt().isEqual(LocalDate.now()));
+                    break;
+                case "last7days":
+                    posts.removeIf(post -> post.getCreatedAt().isBefore(LocalDate.now().minusDays(7)));
+                    break;
+                case "last31days":
+                    posts.removeIf(post -> post.getCreatedAt().isBefore(LocalDate.now().minusDays(31)));
+                    break;
+                case "last12months":
+                    posts.removeIf(post -> post.getCreatedAt().isBefore(LocalDate.now().minusMonths(12)));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid filter value");
+            }
+        }
+        
+        return posts;
     }
 }

@@ -133,6 +133,48 @@ public class PostsControllerTests {
                 .andExpect(jsonPath("$[3].id").value("4"))
                 .andExpect(jsonPath("$[4].id").value("5"));
     }
-    
-    
+
+    @Test
+    public void getAllPosts_WithDateFilters_ShouldReturnFilteredPosts() throws Exception {
+        // Test for posts from today
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "today"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value("1"));
+
+        // Test for posts from the last 7 days
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "last7days"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[1].id").value("2"));
+
+        // Test for posts from the last 31 days
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "last31days"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[1].id").value("2"))
+                .andExpect(jsonPath("$[2].id").value("3"));
+
+        // Test for posts from the last 12 months
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "last12months"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[1].id").value("2"))
+                .andExpect(jsonPath("$[2].id").value("3"))
+                .andExpect(jsonPath("$[3].id").value("4"));
+    }
+
+    @Test
+    public void getAllPosts_WithInvalidFilter_ShouldReturn400() throws Exception {
+        mockMvc.perform(get("/api/posts")
+                        .param("filter", "invalidFilter"))
+                .andExpect(status().isBadRequest());
+    }
 }
