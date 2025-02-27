@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface PostsRepository extends ListCrudRepository<Post, Integer> {
     Post save(Post newPost);
+    Optional<Post> getPostById(int id);
 }

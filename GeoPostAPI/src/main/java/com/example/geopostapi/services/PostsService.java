@@ -10,6 +10,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class PostsService {
@@ -28,6 +29,7 @@ public class PostsService {
                 .queryParam("lon", requestBody.getLon())
                 .queryParam("format", "json")
                 .queryParam("addressdetails", 1)
+                .queryParam("accept-language", "en")
                 .toUriString();
 
         Map<String, Object> response = restTemplate.getForObject(url, Map.class);
@@ -54,6 +56,9 @@ public class PostsService {
         );
         
         return postsRepository.save(postToSave);
-        
+    }
+    
+    public Optional<Post> getPostById(int id) {
+        return postsRepository.getPostById(id);
     }
 }
