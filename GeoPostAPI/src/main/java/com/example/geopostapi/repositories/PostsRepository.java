@@ -11,4 +11,5 @@ import java.util.List;
 public interface PostsRepository extends ListCrudRepository<Post, Integer> {
     Post save(Post newPost);
     Optional<Post> getPostById(int id);
+    List<Post> findAll();
 }

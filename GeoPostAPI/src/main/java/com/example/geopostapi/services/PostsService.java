@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -60,5 +61,14 @@ public class PostsService {
     
     public Optional<Post> getPostById(int id) {
         return postsRepository.getPostById(id);
+    }
+
+    public List<Post> getAllPosts(String filter, String country, String county) {
+        // if all the arguments are null return all posts
+        if (filter == null && country == null && county == null) {
+            return postsRepository.findAll();
+        }
+        
+        return List.of();
     }
 }
