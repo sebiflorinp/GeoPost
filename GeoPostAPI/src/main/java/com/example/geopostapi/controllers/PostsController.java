@@ -3,14 +3,11 @@ package com.example.geopostapi.controllers;
 import com.example.geopostapi.dtos.PostDTO;
 import com.example.geopostapi.models.Post;
 import com.example.geopostapi.services.PostsService;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.sql.ast.tree.insert.Values;
+import org.springframework.data.domain.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -44,13 +41,15 @@ public class PostsController {
     }
     
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getAllPosts(
+    public ResponseEntity<Page<Post>> getAllPosts(
             @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "country", required = false) String country,
-            @RequestParam(value = "county", required = false) String county
+            @RequestParam(value = "county", required = false) String county,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size
     ) {
         try {
-            return ResponseEntity.of(Optional.of(postsService.getAllPosts(filter, country, county)));
+            return ResponseEntity.of(Optional.of(postsService.getAllPosts(filter, country, county, page, size)));
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }

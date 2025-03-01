@@ -4,14 +4,18 @@ import com.example.geopostapi.dtos.PostDTO;
 import com.example.geopostapi.models.Post;
 import com.example.geopostapi.repositories.PostsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
+import static java.util.Collections.reverse;
 
 @Service
 public class PostsService {
@@ -63,12 +67,14 @@ public class PostsService {
         return postsRepository.getPostById(id);
     }
 
-    public List<Post> getAllPosts(String filter, String country, String county) {
+    public Page<Post> getAllPosts(String filter, String country, String county, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
         List<Post> posts = postsRepository.findAll();
         
         // if all the arguments are null return all posts
         if (filter == null && country == null && county == null) {
-            return posts;
+            posts.stream().sorted(Comparator.comparing(Post::getCreatedAt).reversed()).toList();
+            return postsRepository.findAll(pageable);
         }
         
         // if filter is not null return all posts according to their date
@@ -101,6 +107,7 @@ public class PostsService {
             posts.removeIf(post -> !post.getCounty().equals(county));
         }
         
-        return posts;
+        posts.stream().sorted(Comparator.comparing(Post::getCreatedAt).reversed()).toList();
+        return new PageImpl<>(posts, pageable, posts.size());
     }
 }

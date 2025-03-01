@@ -126,12 +126,12 @@ public class PostsControllerTests {
     public void getAllPosts_ShouldReturnAllPosts() throws Exception {
         mockMvc.perform(get("/api/posts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(5)))
-                .andExpect(jsonPath("$[0].id").value("1"))
-                .andExpect(jsonPath("$[1].id").value("2"))
-                .andExpect(jsonPath("$[2].id").value("3"))
-                .andExpect(jsonPath("$[3].id").value("4"))
-                .andExpect(jsonPath("$[4].id").value("5"));
+                .andExpect(jsonPath("$.content", hasSize(5)))
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[1].id").value("2"))
+                .andExpect(jsonPath("$.content[2].id").value("3"))
+                .andExpect(jsonPath("$.content[3].id").value("4"))
+                .andExpect(jsonPath("$.content[4].id").value("5"));
     }
 
     @Test
@@ -140,35 +140,35 @@ public class PostsControllerTests {
         mockMvc.perform(get("/api/posts")
                         .param("filter", "today"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value("1"));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value("1"));
 
         // Test for posts from the last 7 days
         mockMvc.perform(get("/api/posts")
                         .param("filter", "last7days"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value("1"))
-                .andExpect(jsonPath("$[1].id").value("2"));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[1].id").value("2"));
 
         // Test for posts from the last 31 days
         mockMvc.perform(get("/api/posts")
                         .param("filter", "last31days"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].id").value("1"))
-                .andExpect(jsonPath("$[1].id").value("2"))
-                .andExpect(jsonPath("$[2].id").value("3"));
+                .andExpect(jsonPath("$.content", hasSize(3)))
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[1].id").value("2"))
+                .andExpect(jsonPath("$.content[2].id").value("3"));
 
         // Test for posts from the last 12 months
         mockMvc.perform(get("/api/posts")
                         .param("filter", "last12months"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(4)))
-                .andExpect(jsonPath("$[0].id").value("1"))
-                .andExpect(jsonPath("$[1].id").value("2"))
-                .andExpect(jsonPath("$[2].id").value("3"))
-                .andExpect(jsonPath("$[3].id").value("4"));
+                .andExpect(jsonPath("$.content", hasSize(4)))
+                .andExpect(jsonPath("$.content[0].id").value("1"))
+                .andExpect(jsonPath("$.content[1].id").value("2"))
+                .andExpect(jsonPath("$.content[2].id").value("3"))
+                .andExpect(jsonPath("$.content[3].id").value("4"));
     }
 
     @Test
@@ -183,8 +183,8 @@ public class PostsControllerTests {
         mockMvc.perform(get("/api/posts")
                         .param("country", "Romania"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(2));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(2));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class PostsControllerTests {
         mockMvc.perform(get("/api/posts")
                         .param("country", "NonExistentCountry"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
     @Test
@@ -200,8 +200,8 @@ public class PostsControllerTests {
         mockMvc.perform(get("/api/posts")
                         .param("county", "Greater London"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(1));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(1));
     }
 
     @Test
@@ -209,7 +209,7 @@ public class PostsControllerTests {
         mockMvc.perform(get("/api/posts")
                         .param("county", "NonExistentCounty"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)));
     }
 
     @Test
@@ -219,7 +219,35 @@ public class PostsControllerTests {
                         .param("country", "Romania")
                         .param("county", "Bucharest"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(2));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(2));
+    }
+
+    @Test
+    public void getAllPosts_WithPagination_ShouldReturnPaginatedPosts() throws Exception {
+        // First page
+        mockMvc.perform(get("/api/posts")
+                        .param("page", "0")
+                        .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[1].id").value(2));
+
+        // Second page
+        mockMvc.perform(get("/api/posts")
+                        .param("page", "1")
+                        .param("size", "2"))
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(3))
+                .andExpect(jsonPath("$.content[1].id").value(4));
+
+        // Last page
+        mockMvc.perform(get("/api/posts")
+                        .param("page", "2")
+                        .param("size", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].id").value(5));
     }
 }
